@@ -14,13 +14,15 @@ const createBooking = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // Verify all tickets exist and are not already booked
+    // Lock the rows so concurrent requests cannot race on the same tickets
     const placeholders = ticketIds.map(() => '?').join(',');
     const [tickets] = await conn.query(
-      `SELECT t.TicketID, t.BasePrice, t.SeatNumber, bi.TicketID AS AlreadyBooked
+      `SELECT t.TicketID, t.BasePrice, t.SeatNumber, t.EventID,
+              bi.TicketID AS AlreadyBooked
        FROM ticket t
        LEFT JOIN booking_item bi ON t.TicketID = bi.TicketID
-       WHERE t.TicketID IN (${placeholders})`,
+       WHERE t.TicketID IN (${placeholders})
+       FOR UPDATE`,          // ← row-level lock prevents race condition
       ticketIds
     );
 
@@ -44,7 +46,7 @@ const createBooking = async (req, res) => {
     );
     const bookingId = bookingResult.insertId;
 
-    // Insert booking items with sold price = base price
+    // Insert booking items — DB UNIQUE(TicketID) is the final safety net
     for (const ticket of tickets) {
       await conn.query(
         'INSERT INTO booking_item (BookingID, TicketID, SoldPrice) VALUES (?, ?, ?)',
@@ -67,6 +69,10 @@ const createBooking = async (req, res) => {
     res.status(201).json({ ...booking[0], items: tickets.map((t) => ({ ticketId: t.TicketID, soldPrice: t.BasePrice, seatNumber: t.SeatNumber })) });
   } catch (err) {
     await conn.rollback();
+    // Handle DB-level unique constraint violation (race condition fallback)
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'One or more seats were just booked by another user.' });
+    }
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   } finally {

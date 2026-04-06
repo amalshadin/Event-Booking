@@ -86,6 +86,10 @@ const createEvent = async (req, res) => {
 
     res.status(201).json(event[0]);
   } catch (err) {
+    // DB-level safety net: UNIQUE(VenueID, EventDateTime) fires on race conditions
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'This venue is already booked at that date/time' });
+    }
     console.error(err);
     res.status(500).json({ message: 'Server error' });
   }

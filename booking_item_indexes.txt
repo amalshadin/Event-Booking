@@ -1,0 +1,5 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+booking_item	0	PRIMARY	1	BookingID	A	2	NULL	NULL		BTREE			YES	NULL
+booking_item	0	PRIMARY	2	TicketID	A	2	NULL	NULL		BTREE			YES	NULL
+booking_item	1	fk_booking_item_ticket	1	TicketID	A	2	NULL	NULL		BTREE			YES	NULL

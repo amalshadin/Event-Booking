@@ -99,3 +99,21 @@ CREATE TABLE IF NOT EXISTS payment (
     Timestamp     DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (BookingID) REFERENCES booking(BookingID)
 );
+
+-- ============================================================
+-- Triggers
+-- ============================================================
+
+DELIMITER //
+
+CREATE TRIGGER IF NOT EXISTS after_payment_insert
+AFTER INSERT ON payment
+FOR EACH ROW
+BEGIN
+    -- Automatically set the parent booking to Confirmed when the payment is completed
+    IF NEW.PaymentStatus = 'Completed' THEN
+        UPDATE booking SET Status = 'Confirmed' WHERE BookingID = NEW.BookingID;
+    END IF;
+END; //
+
+DELIMITER ;

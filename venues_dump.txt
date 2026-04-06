@@ -1,0 +1,5 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+VenueID	Name	City
+1	Main Hall	Anytown
+2	Grand Hall	New York
+3	College Auditorium	Pampady

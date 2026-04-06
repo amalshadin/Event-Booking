@@ -38,8 +38,7 @@ const createPayment = async (req, res) => {
         [bookingId, paymentMethod, amountPaid]
       );
 
-      // Update booking status to Confirmed
-      await conn.query("UPDATE booking SET Status = 'Confirmed' WHERE BookingID = ?", [bookingId]);
+      // (The DB trigger "after_payment_insert" automatically updates the Booking status to Confirmed here)
 
       await conn.commit();
 

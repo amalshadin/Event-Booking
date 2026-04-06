@@ -1,0 +1,15 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+PRIMARY	booking	PRIMARY KEY
+PRIMARY	booking_item	PRIMARY KEY
+PRIMARY	customer	PRIMARY KEY
+PRIMARY	event	PRIMARY KEY
+unique_venue_datetime	event	UNIQUE
+PRIMARY	organizer	PRIMARY KEY
+PRIMARY	payment	PRIMARY KEY
+PRIMARY	ticket	PRIMARY KEY
+unique_event_seat	ticket	UNIQUE
+Email	user	UNIQUE
+PRIMARY	user	PRIMARY KEY
+PRIMARY	user_credentials	PRIMARY KEY
+PRIMARY	user_phone	PRIMARY KEY
+PRIMARY	venue	PRIMARY KEY

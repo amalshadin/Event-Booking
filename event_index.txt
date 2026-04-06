@@ -1,0 +1,4 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+event	0	unique_venue_datetime	1	VenueID	A	2	NULL	NULL	YES	BTREE			YES	NULL
+event	0	unique_venue_datetime	2	EventDateTime	A	2	NULL	NULL		BTREE			YES	NULL
