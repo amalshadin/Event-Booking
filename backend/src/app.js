@@ -8,6 +8,10 @@ const eventRoutes = require('./routes/events');
 const ticketRoutes = require('./routes/tickets');
 const bookingRoutes = require('./routes/bookings');
 const paymentRoutes = require('./routes/payments');
+const feedbackRoutes = require('./routes/feedback');
+
+const connectMongoDB = require('./config/mongo');
+connectMongoDB(); // Initialize MongoDB side-by-side with MySQL
 
 const app = express();
 
@@ -22,6 +26,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/events/:eventId/tickets', ticketRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));

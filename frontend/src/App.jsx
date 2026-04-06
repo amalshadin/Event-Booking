@@ -7,6 +7,7 @@ import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import BookingPage from './pages/BookingPage';
 import OrganizerDashboard from './pages/OrganizerDashboard';
+import FeedbackWidget from './components/FeedbackWidget';
 
 // Protected route wrapper
 const ProtectedRoute = ({ children, role }) => {
@@ -37,6 +38,7 @@ function AppRoutes() {
         />
         <Route path="*" element={<Navigate to="/events" replace />} />
       </Routes>
+      <FeedbackWidget />
     </>
   );
 }
