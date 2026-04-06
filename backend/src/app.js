@@ -36,8 +36,19 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n🚀 Event Booking API running on http://localhost:${PORT}\n`);
+});
+
+process.on('exit', (code) => {
+  console.log('>>> Process exiting with code:', code);
+});
+process.on('uncaughtException', (err) => {
+  console.error('>>> Uncaught Exception:', err);
+});
+process.on('SIGINT', () => {
+  console.log('>>> Caught interrupt signal');
+  process.exit();
 });
 
 module.exports = app;
