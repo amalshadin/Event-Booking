@@ -120,4 +120,27 @@ const getMyEvents = async (req, res) => {
   }
 };
 
-module.exports = { getEvents, getEventById, createEvent, getMyEvents };
+// PATCH /api/events/:eventId/cancel  (Organizer only)
+const cancelEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const organizerId = req.user.userId;
+
+  try {
+    const [event] = await pool.query(
+      'SELECT OrganizerID, EventStatus FROM event WHERE EventID = ?',
+      [eventId]
+    );
+
+    if (event.length === 0) return res.status(404).json({ message: 'Event not found' });
+    if (event[0].OrganizerID !== organizerId) return res.status(403).json({ message: 'Not authorized' });
+    if (event[0].EventStatus === 'Cancelled') return res.status(400).json({ message: 'Event is already cancelled' });
+
+    await pool.query("UPDATE event SET EventStatus = 'Cancelled' WHERE EventID = ?", [eventId]);
+    res.json({ message: 'Event has been cancelled successfully', eventId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getEvents, getEventById, createEvent, getMyEvents, cancelEvent };

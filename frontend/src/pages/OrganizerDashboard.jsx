@@ -47,6 +47,19 @@ export default function OrganizerDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleCancelEvent = async (eventId, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to cancel this event? Users will no longer be able to see or book it.')) return;
+    try {
+      await api.patch(`/events/${eventId}/cancel`);
+      setMyEvents((prev) =>
+        prev.map((ev) => (ev.EventID === eventId ? { ...ev, EventStatus: 'Cancelled' } : ev))
+      );
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to cancel event');
+    }
+  };
+
   // ── Create Event ─────────────────────────────────
   const handleCreateEvent = async (e) => {
     e.preventDefault();
@@ -164,11 +177,11 @@ export default function OrganizerDashboard() {
               <div
                 key={ev.EventID}
                 className="card"
-                style={{ display:'flex', alignItems:'center', gap:'1rem', cursor:'pointer', padding:'1rem 1.25rem' }}
+                style={{ display:'flex', alignItems:'center', gap:'1rem', cursor:'pointer', padding:'1rem 1.25rem', opacity: ev.EventStatus === 'Cancelled' ? 0.6 : 1 }}
                 onClick={() => navigate(`/events/${ev.EventID}`)}
               >
                 <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:700, marginBottom:'0.25rem' }}>{ev.Title}</div>
+                  <div style={{ fontWeight:700, marginBottom:'0.25rem', textDecoration: ev.EventStatus === 'Cancelled' ? 'line-through' : 'none' }}>{ev.Title}</div>
                   <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap' }}>
                     <span className="event-card-info" style={{ fontSize:'0.82rem' }}><Calendar size={12} color="var(--accent-light)" />{fmt(ev.EventDateTime)}</span>
                     <span className="event-card-info" style={{ fontSize:'0.82rem' }}><MapPin size={12} color="var(--accent-light)" />{ev.VenueName}{ev.City ? `, ${ev.City}` : ''}</span>
@@ -179,9 +192,19 @@ export default function OrganizerDashboard() {
                     <Ticket size={12} style={{ display:'inline', marginRight:4 }} />
                     {ev.BookedTickets}/{ev.TotalTickets} sold
                   </div>
-                  <span className={`badge ${ev.EventStatus === 'Active' ? 'badge-success' : 'badge-muted'}`}>{ev.EventStatus}</span>
+                  <span className={`badge ${ev.EventStatus === 'Active' ? 'badge-success' : 'badge-danger'}`}>{ev.EventStatus}</span>
                 </div>
-                <ChevronRight size={16} color="var(--text-muted)" />
+                {ev.EventStatus === 'Active' ? (
+                  <button 
+                    className="badge badge-danger" 
+                    style={{ border: 'none', cursor: 'pointer', padding: '0.4rem 0.6rem' }} 
+                    onClick={(e) => handleCancelEvent(ev.EventID, e)}
+                  >
+                    Cancel
+                  </button>
+                ) : (
+                  <ChevronRight size={16} color="var(--text-muted)" />
+                )}
               </div>
             ))}
           </div>
